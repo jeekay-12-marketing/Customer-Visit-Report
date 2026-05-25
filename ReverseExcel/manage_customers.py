@@ -335,33 +335,63 @@ def show_manage_customers():
     # ══════════════════════════════════════
     with tab1:
         customers = load_customers()
-
         if not customers:
             st.info("No customers added yet. Use the 'Add New Customer' tab to get started.")
         else:
             # ── Search + Filter ──
             col_s, col_b = st.columns([3, 1])
             with col_s:
-                search = st.text_input("🔍 Search", placeholder="Search by name, area, industry...", key="mc_search", label_visibility="collapsed")
+                search = st.text_input(
+                    "🔍 Search",
+                    placeholder="Search by name, area, industry...",
+                    key="mc_search",
+                    label_visibility="collapsed"
+                )
             with col_b:
-                filter_branch = st.selectbox("Branch", ["All"] + BRANCH_OPTIONS, key="mc_filter_branch", label_visibility="collapsed")
+                filter_branch = st.selectbox(
+                    "Branch", ["All"] + BRANCH_OPTIONS,
+                    key="mc_filter_branch",
+                    label_visibility="collapsed"
+                )
 
-            # Apply filters
+            # ── Reset page if filters changed ──
+            prev_search = st.session_state.get("_prev_mc_search", "")
+            prev_branch = st.session_state.get("_prev_mc_branch", "All")
+
+            if search != prev_search or filter_branch != prev_branch:
+                st.session_state["mc_page"]          = 0
+                st.session_state["_prev_mc_search"]  = search
+                st.session_state["_prev_mc_branch"]  = filter_branch
+
+            # ── Apply filters ──
             filtered = customers
             if filter_branch != "All":
                 filtered = [c for c in filtered if c.get("branch") == filter_branch]
             if search:
-                s = search.lower()
+                s        = search.lower()
                 filtered = [c for c in filtered if
-                    s in c.get("name", "").lower() or
-                    s in c.get("area", "").lower() or
-                    s in c.get("industry", "").lower()
-                ]
+                            s in c.get("name",     "").lower() or
+                            s in c.get("area",     "").lower() or
+                            s in c.get("industry", "").lower()]
 
-            st.markdown(f'<div style="font-size:0.8rem; color:#5A6A85; margin-bottom:0.8rem;">{len(filtered)} customer(s) found</div>', unsafe_allow_html=True)
+            # ── Pagination ──
+            ITEMS_PER_PAGE = 20
+            page_num       = st.session_state.get("mc_page", 0)
+            total_filtered = len(filtered)
+            total_pages    = max(1, (total_filtered - 1) // ITEMS_PER_PAGE + 1)
+            start          = page_num * ITEMS_PER_PAGE
+            end            = start + ITEMS_PER_PAGE
+            page_customers = filtered[start:end]
+
+            st.markdown(
+                f"<div style='font-family:Outfit,sans-serif;font-size:0.8rem;"
+                f"color:#5A6A85;margin-bottom:0.8rem;'>"
+                f"Showing {start+1}–{min(end, total_filtered)} of {total_filtered} customer(s)</div>",
+                unsafe_allow_html=True
+            )
 
             # ── Customer rows ──
-            for c in filtered:
+            for c in page_customers:
                 with st.container():
                     c1, c2 = st.columns([5, 1])
                     with c1:
@@ -377,12 +407,13 @@ def show_manage_customers():
                         """, unsafe_allow_html=True)
                     with c2:
                         with st.expander("⋮"):
-                            # ── Edit ──
-                            new_branch   = st.selectbox("Branch",   BRANCH_OPTIONS, index=BRANCH_OPTIONS.index(c["branch"]) if c["branch"] in BRANCH_OPTIONS else 0, key=f"eb_{c['id']}")
-                            new_area     = st.text_input("Area",     value=c.get("area", ""),     key=f"ea_{c['id']}")
-                            new_name     = st.text_input("Name",     value=c.get("name", ""),     key=f"en_{c['id']}")
-                            new_industry = st.text_input("Industry", value=c.get("industry", ""), key=f"ei_{c['id']}")
-
+                            new_branch   = st.selectbox("Branch", BRANCH_OPTIONS,
+                                                        index=BRANCH_OPTIONS.index(c["branch"])
+                                                        if c.get("branch") in BRANCH_OPTIONS else 0,
+                                                        key=f"eb_{c['id']}")
+                            new_area     = st.text_input("Area",     value=c.get("area",""),     key=f"ea_{c['id']}")
+                            new_name     = st.text_input("Name",     value=c.get("name",""),     key=f"en_{c['id']}")
+                            new_industry = st.text_input("Industry", value=c.get("industry",""), key=f"ei_{c['id']}")
                             col_save, col_del = st.columns(2)
                             with col_save:
                                 if st.button("💾 Save", key=f"save_{c['id']}", use_container_width=True):
@@ -394,13 +425,30 @@ def show_manage_customers():
                                         st.error(msg)
                             with col_del:
                                 if st.button("🗑 Delete", key=f"del_{c['id']}", use_container_width=True, type="primary"):
-                                    ok, msg = delete_customer(c["id"], c.get("name", ""))
+                                    ok, msg = delete_customer(c["id"], c.get("name",""))
                                     if ok:
                                         st.success(msg)
                                         st.rerun()
                                     else:
                                         st.error(msg)
 
+            # ── Pagination controls ──
+            col_prev, col_info, col_next = st.columns([1, 2, 1])
+            with col_prev:
+                if st.button("← Prev", disabled=(page_num == 0), key="mc_prev", use_container_width=True):
+                    st.session_state["mc_page"] = page_num - 1
+                    st.rerun()
+            with col_info:
+                st.markdown(
+                    f"<div style='text-align:center;font-family:Outfit,sans-serif;"
+                    f"font-size:0.85rem;color:#6B7A99;padding-top:6px;'>"
+                    f"Page {page_num+1} of {total_pages}</div>",
+                    unsafe_allow_html=True
+                )
+            with col_next:
+                if st.button("Next →", disabled=(page_num >= total_pages - 1), key="mc_next", use_container_width=True):
+                    st.session_state["mc_page"] = page_num + 1
+                    st.rerun()  
     # ══════════════════════════════════════
     # TAB 2 — Add New Customer
     # ══════════════════════════════════════
