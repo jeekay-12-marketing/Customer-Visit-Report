@@ -16,7 +16,7 @@ from google.cloud.firestore_v1.base_query import FieldFilter
 # ─────────────────────────────────────────
 # CONSTANTS
 # ─────────────────────────────────────────
-BRANCH_OPTIONS = ["Mumbai", "KOTTAYAM", "COIMBATORE", "KOZHIKODE", "THRISSUR"]
+BRANCH_OPTIONS = ["MUMBAI", "KOTTAYAM", "COIMBATORE", "KOZHIKODE", "THRISSUR"]
 
 DISPLAY_COLS = [
     "Date", "Branch", "Area", "Samira Team", "Customer", "Industry",
