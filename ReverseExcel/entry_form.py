@@ -484,6 +484,13 @@ def show_entry_form():
         key="ef_remarks"
     )
 
+    follow_up = st.text_area(
+        "Follow Up",
+        placeholder="...",
+        height=80,
+        key="ef_fb_fu_text"
+    )
+
     feedback_of_previous_follow_up = st.text_area(
         "Feedback of Previous Follow Up",
         placeholder="...",
@@ -498,14 +505,14 @@ def show_entry_form():
 
     col10, col11 = st.columns(2)
     with col10:
-        follow_up = st.selectbox(
+        follow_up_required = st.selectbox(
             "Follow Up Required? *",
             ["", "Yes", "No"],
-            key="ef_followup"
+            key="ef_followup_required"
         )
     with col11:
         follow_up_date = None
-        if follow_up == "Yes":
+        if follow_up_required == "Yes":
             follow_up_date = st.date_input(
                 "Follow Up Date *",
                 value=None,
@@ -517,6 +524,7 @@ def show_entry_form():
     # ══════════════════════════════════════
     # VALIDATION + REVIEW
     # ══════════════════════════════════════
+
     if st.button("👁️👁️ Review Before Submitting", type="primary", use_container_width=True):
         errors = validate_entry_form(
         visit_date        = visit_date,
@@ -527,8 +535,6 @@ def show_entry_form():
         customer_team     = customer_team,
         oldest_bill_date  = oldest_bill_date,
         total_outstanding = total_outstanding,
-        follow_up         = follow_up,
-        follow_up_date    = follow_up_date
         )
         if errors:
             for e in errors:
@@ -550,8 +556,9 @@ def show_entry_form():
                 "company_updates":    company_updates.strip(),
                 "market_updates":     market_updates.strip(),
                 "other_remarks":      other_remarks.strip(),
+                "follow_up": follow_up,
                 "feedback_of_previous_follow_up" :feedback_of_previous_follow_up.strip(),
-                "follow_up":          follow_up,
+                "follow_up_required":          follow_up_required,
                 "follow_up_date":     str(follow_up_date) if follow_up_date else "",
                 "submitted_by":       st.session_state["email"],
                 "submitted_at":       datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -585,8 +592,9 @@ def _show_review():
         ("Company Updates",        data.get("company_updates") or "—"),
         ("Market Updates",         data.get("market_updates") or "—"),
         ("Other Remarks",          data.get("other_remarks") or "—"),
+        ("Follow Up",     data.get("follow_up") or "-"),
         ("Feedback of Previous Follow Up", data.get("feedback_of_previous_follow_up") or "—"),
-        ("Follow Up",              data.get("follow_up")),
+        ("Follow Up Required?",              data.get("follow_up_required")),
         ("Follow Up Date",         data.get("follow_up_date") or "—"),
         ("Submitted By",           data.get("submitted_by")),
         ("Submitted At",           data.get("submitted_at")),
@@ -635,8 +643,9 @@ def _show_review():
             st.session_state["ef_company"]      = data.get("company_updates", "")
             st.session_state["ef_market"]       = data.get("market_updates", "")
             st.session_state["ef_remarks"]      = data.get("other_remarks", "")
-            st.session_state["ef_fb_prev_fu"]   = data.get("feedback_of_previous_follow_up", "")            
-            st.session_state["ef_followup"]     = data.get("follow_up", "")
+            st.session_state["ef_fb_fu_text"] = data.get("follow_up")
+            st.session_state["ef_fb_prev_fu"]   = data.get("feedback_of_previous_follow_up", "") 
+            st.session_state["ef_followup_required"]     = data.get("follow_up_required", "")
             st.session_state["ef_followup_date"]= parse_date(data.get("follow_up_date")) or None
             st.session_state["entry_review"] = False
             st.rerun()
