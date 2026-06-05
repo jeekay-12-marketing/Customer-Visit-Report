@@ -27,6 +27,7 @@ HEADERS = [
     "Market / End Market Updates",
     "Other Remarks",
     "Follow up",
+    "Follow up Required?"
     "Follow up Date",
     "Feedback of Previous Follow Up",
     "Submitted By",
@@ -98,6 +99,7 @@ def build_row(data: dict) -> list:
         data.get("market_updates", ""),
         data.get("other_remarks", ""),
         data.get("follow_up", ""),
+        data.get("follow_up_required", ""),
         data.get("follow_up_date", ""),
         data.get("feedback_of_previous_follow_up"),
         data.get("submitted_by", ""),
