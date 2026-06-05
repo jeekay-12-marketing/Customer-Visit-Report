@@ -23,7 +23,7 @@ DISPLAY_COLS = [
     "Customer Team", "Oldest Bill Date", "Period (Days)", "Total Outstanding",
     "Our Products offered / discussed", "Competitor products / prices",
     "Company Updates", "Market / End Market Updates", "Other Remarks",
-    "Follow up", "Follow up Date", "Feedback of Previous Follow Up"
+    "Follow up","Follow up Required?", "Follow up Date", "Feedback of Previous Follow Up"
 ]
 
 FIRESTORE_TO_DISPLAY = {
