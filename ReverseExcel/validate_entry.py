@@ -65,7 +65,7 @@ def validate_customer_team(val: str) -> tuple:
 def validate_oldest_bill_date(val) -> tuple:
     """Oldest Bill Date cannot be a future date."""
     if not val:
-        return False, "Oldest Bill Date is required."
+        return True, None
     try:
         # Handle both date objects and strings
         if isinstance(val, str):
@@ -129,8 +129,6 @@ def validate_entry_form(
     customer_team: str,
     oldest_bill_date,
     total_outstanding,
-    follow_up: str,
-    follow_up_date,
 ) -> list:
     """
     Runs all validations and returns a list of error strings.
@@ -147,8 +145,6 @@ def validate_entry_form(
         validate_customer_team(customer_team),
         validate_oldest_bill_date(oldest_bill_date),
         validate_total_outstanding(total_outstanding),
-        validate_follow_up(follow_up),
-        validate_follow_up_date(follow_up_date, follow_up),
     ]
 
     for is_valid, msg in checks:
