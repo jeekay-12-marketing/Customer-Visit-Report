@@ -426,20 +426,6 @@ def show_entry_form():
 
     col7, col8, col9 = st.columns(3)
     with col7:
-        oldest_bill_date = st.date_input(
-            "Oldest Bill Date",
-            value=None,
-            key="ef_oldest_bill"
-        )
-    with col8:
-        if oldest_bill_date:
-            period_days = (date.today() - oldest_bill_date).days
-            st.metric("Period (Days)", f"{period_days} days")
-        else:
-            period_days = 0
-            st.metric("Period (Days)", "—")
-
-    with col9:
         total_outstanding = st.number_input(
             "Total Outstanding (₹)",
             min_value=0,
@@ -447,6 +433,27 @@ def show_entry_form():
             step=1000,
             key="ef_outstanding"
         )
+        
+    with col8:
+        if total_outstanding > 0:
+            oldest_bill_date = st.date_input(
+                "Oldest Bill Date",
+                value=None,
+                key="ef_oldest_bill"
+            )   
+        else:
+            oldest_bill_date = None 
+        if total_outstanding > 0 and oldest_bill_date == None:
+            st.error("Oldest Bill Date is required!")    
+
+    with col9:
+        if oldest_bill_date:
+            period_days = (date.today() - oldest_bill_date).days
+            st.metric("Period (Days)", f"{period_days} days")
+        else:
+            period_days = 0
+            st.metric("Period (Days)", "—")
+        
 
     # ══════════════════════════════════════
     # SECTION 3 — Discussion Notes
@@ -484,12 +491,6 @@ def show_entry_form():
         key="ef_remarks"
     )
 
-    follow_up = st.text_area(
-        "Follow Up",
-        placeholder="...",
-        height=80,
-        key="ef_fb_fu_text"
-    )
 
     feedback_of_previous_follow_up = st.text_area(
         "Feedback of Previous Follow Up",
@@ -503,7 +504,7 @@ def show_entry_form():
     # ══════════════════════════════════════
     st.markdown('<div class="section-label">📅 Follow Up</div>', unsafe_allow_html=True)
 
-    col10, col11 = st.columns(2)
+    col10, col11, col12 = st.columns(3)
     with col10:
         follow_up_required = st.selectbox(
             "Follow Up Required? *",
@@ -518,6 +519,13 @@ def show_entry_form():
                 value=None,
                 key="ef_followup_date"
             )
+    with col12:
+        follow_up = st.text_area(
+        "Follow Up",
+        placeholder="...",
+        height=80,
+        key="ef_fb_fu_text"
+    )
 
     st.divider()
 
