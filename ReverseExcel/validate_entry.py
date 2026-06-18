@@ -74,6 +74,7 @@ def validate_oldest_bill_date(val) -> tuple:
         if val > date.today():
             return False, "Oldest Bill Date cannot be a future date."
         return True, None
+        
     except Exception:
         return False, "Oldest Bill Date is invalid."
 
