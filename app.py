@@ -165,6 +165,7 @@ if st.session_state["role"] == "admin":
 
 else:
     with st.sidebar:
+        email = st.session_state['email']
         st.markdown(
             f"""
             <div style="
