@@ -415,7 +415,7 @@ def show_entry_form():
 
     customer_team = st.text_input(
         "Customer Team",
-        placeholder="e.g. Mr. Raj (Purchase), Ms. Priya (MD)",
+        placeholder="e.g. Mr. Raj, Ms. Priya",
         key="ef_customer_team"
     )
 
