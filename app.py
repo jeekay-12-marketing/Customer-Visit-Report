@@ -334,6 +334,7 @@ h1, h2, h3 {
 }
 
 /* ══════════════════════════════════════
+   * ══════════════════════════════════════
    KPI METRIC CARDS
 ══════════════════════════════════════ */
 [data-testid="stMetric"] {
@@ -344,6 +345,10 @@ h1, h2, h3 {
     padding: 20px 24px !important;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: fit-content !important;
+    min-width: 190px;                    
+    max-width: 200%;                     
+    margin: 0 auto;
 }
 [data-testid="stMetric"]:hover {
     transform: translateY(-3px);
@@ -357,6 +362,7 @@ h1, h2, h3 {
     color: var(--text-muted) !important;
     font-family: 'Libre Baskerville', serif !important;
     margin-bottom: 6px;
+    white-space: nowrap;
 }
 [data-testid="stMetricValue"] {
     font-size: 30px !important;
@@ -364,6 +370,11 @@ h1, h2, h3 {
     color: var(--navy) !important;
     font-family: 'Libre Baskerville', serif !important;
     line-height: 1.2;
+    white-space: nowrap;
+}
+
+div[data-test-id="column"]{
+gap: 1rem !important;
 }
 
 /* ══════════════════════════════════════
@@ -446,7 +457,47 @@ h1, h2, h3 {
     min-height: 72px;
     background: var(--card-bg);
 }
-
+/* ══════════════════════════════════════
+   CUSTOMER HEADER CARDS (HTML divs)
+══════════════════════════════════════ */
+.customer-header-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.customer-header-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(27,42,74,0.15);
+}
+.customer-header-card-b {
+    background: var(--navy);
+    color: var(--gold-light) !important;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px 16px;
+    min-height: 72px;
+    border-bottom: 2px solid var(--gold);
+            
+}
+.customer-header-card-h {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 500;
+    line-height: 1.8;
+    color: var(--text-main);
+    padding: 12px;
+    min-height: 2px;
+    background: var(--card-bg);
+}
 /* ── Reset Filters button ── */
 section[data-testid="stSidebar"] .stButton > button {
     background: transparent !important;
@@ -547,24 +598,43 @@ if industry != "All":
 measures = calculate_measures(filtered_df)
 
 # -----------------------------
-# 🔢 KPI SECTION
 # -----------------------------
-col1, col2, col3, col4 = st.columns(4)
+if customer != "All":
+    cust_sam_team = filtered_df["Samira Team"].iloc[-1] if not filtered_df.empty else "N/A"
+    
+    # More flexible column ratios
+    col9, col10, col11 = st.columns([1.4, 1.0, 1.3])
+    
+    #col9.metric("Selected Customer", customer)
+    
+    with col9:
+        st.markdown(f'<div class="customer-header-card"><div class="customer-header-card-h">Selected Customer:</div><div class="customer-header-card-b">{customer or "–"}</div></div>', unsafe_allow_html=True)
+    with col10:
+        st.markdown(f'<div class="customer-header-card"><div class="customer-header-card-h">Outstanding Days:</div><div class="customer-header-card-b">{measures["Outstanding Days"] or "–"}</div></div>', unsafe_allow_html=True)
+    with col11:
+        st.markdown(f'<div class="customer-header-card"><div class="customer-header-card-h">Samira Team:</div><div class="customer-header-card-b">{cust_sam_team or "–"}</div></div>', unsafe_allow_html=True)
+    
+    
+    #col10.metric("Outstanding Days", measures["Outstanding Days"])
+    #col11.metric("Samira Team", cust_sam_team)
+    
+    st.divider()
+    
+    
+    # Show Branch & Area together in one nice card
+
+col1, col2, col3, col7  = st.columns(4)
 
 col1.metric("Total Visits", measures["Total Visits"])
 col2.metric("Latest Visit", measures["Latest Visit Date"])
 col3.metric("Days Since Last Visit", measures["Days Since Last Visit"])
-col4.metric("Follow-up Status", measures["Follow-up Status"])
+col7.metric("Total Outstanding",  format_inr(measures['Total Outstanding']))
 
-col5, col6, col7, col8, col9 = st.columns(5)
 
-col5.metric("Upcoming Follow-up", measures["Upcoming Follow-up Date"])
-col6.metric("Days Until Follow-up", measures["Days Until Follow-up"])
-col7.metric("Oldest Bill Date", measures["Oldest Bill Date (Customer)"])
-col8.metric("Total Outstanding",  format_inr(measures['Total Outstanding']))
-if customer!="All":
-    col9.metric("Outstanding Days", measures["Outstanding Days"])
-
+col5, col6, col8= st.columns(3)
+col5.metric("Follow-up Status", measures["Follow-up Status"])
+col6.metric("Upcoming Follow-up", measures["Upcoming Follow-up Date"])
+col8.metric("Days Until Follow-up", measures["Days Until Follow-up"])
 # -----------------------------
 # 📋 TABLE (TOP RIGHT)
 # -----------------------------
@@ -577,6 +647,7 @@ display_cols = [
     "Area",
     "Industry",
     "Customer Team",
+    "Samira Team",
     "Our Products offered / discussed",
     "Oldest Bill Date",
     "Period (Days)",
