@@ -3,7 +3,9 @@ from firebase_admin import credentials, auth, firestore
 import streamlit as st
 
 def init_firebase():
-    if not firebase_admin._apps:
+    try:
+        firebase_admin.get_app()
+    except ValueError:
         cred = credentials.Certificate(dict(st.secrets["firebase"]))
         firebase_admin.initialize_app(cred)
 
