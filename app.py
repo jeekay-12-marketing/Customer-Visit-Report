@@ -107,30 +107,30 @@ if st.session_state["role"] == "admin":
         )
         st.divider()
 
-        if st.button("Dashboard", key="nav_dash", use_container_width=True):
+        if st.button("Dashboard", key="nav_dash", width = 'stretch'):
             st.session_state["page"] = "dashboard"
             st.rerun()
 
-        if st.button("Admin Panel", key="nav_admin", use_container_width=True):
+        if st.button("Admin Panel", key="nav_admin", width = 'stretch'):
             st.session_state["page"] = "admin"
             st.rerun()
         
-        if st.button("👥 Manage Customers", key="nav_customers", use_container_width=True):
+        if st.button("👥 Manage Customers", key="nav_customers", width = 'stretch'):
             st.session_state["page"] = "customers"
             st.rerun()
         st.divider()
 
-        if st.button("➕ Add Visit Entry", key="nav_entry", use_container_width=True):
+        if st.button("➕ Add Visit Entry", key="nav_entry", width = 'stretch'):
             st.session_state["page"] = "entry"
             st.rerun()
         
-        if st.button("📬 Mail Weekly Report", key="nav_wr", use_container_width=True):
+        if st.button("📬 Mail Weekly Report", key="nav_wr", width = 'stretch'):
             st.session_state["page"] = "weekly_report"
             st.rerun()
 
         st.divider()
 
-        if st.button("Logout", key="logout_btn", use_container_width=True):
+        if st.button("Logout", key="logout_btn", width = 'stretch'):
                 from google.cloud import firestore as fs
                 token = cookies.get("token")
                 uid = st.session_state.get("uid")
@@ -192,20 +192,20 @@ else:
         )
         st.divider()
 
-        if st.button("Dashboard", key="nav_dash", use_container_width=True):
+        if st.button("Dashboard", key="nav_dash", width = 'stretch'):
             st.session_state["page"] = "dashboard"
             st.rerun()
 
-        if st.button("➕ Add Visit Entry", key="nav_entry", use_container_width=True):
+        if st.button("➕ Add Visit Entry", key="nav_entry", width = 'stretch'):
             st.session_state["page"] = "entry"
             st.rerun()
         st.divider()
         
-        if st.button("📬 Mail Weekly Report", key="nav_wr", use_container_width=True):
+        if st.button("📬 Mail Weekly Report", key="nav_wr", width = 'stretch'):
             st.session_state["page"] = "weekly_report"
             st.rerun()
 
-        if st.button("Logout", key="logout_btn", use_container_width=True):
+        if st.button("Logout", key="logout_btn", width = 'stretch'):
             from google.cloud import firestore as fs
             token = cookies.get("token")
             uid = st.session_state.get("uid")
@@ -543,7 +543,7 @@ df = load_and_preprocess_data()
 st.sidebar.header("Filters")
 
 # Reset button
-if st.sidebar.button("🔄  Reset Filters", use_container_width=True, key="reset_filters_btn"):
+if st.sidebar.button("🔄  Reset Filters", width = 'stretch', key="reset_filters_btn"):
     st.session_state["branch_filter"] = "All"
     st.session_state["area_filter"] = "All"
     st.session_state["customer_filter"] = "All"
@@ -601,11 +601,10 @@ measures = calculate_measures(filtered_df)
 # -----------------------------
 if customer != "All":
     cust_sam_team = filtered_df["Samira Team"].iloc[-1] if not filtered_df.empty else "N/A"
+    polymer_consumed = filtered_df["Polymer Consumed"].sum()if not filtered_df.empty else "-" 
     
     # More flexible column ratios
-    col9, col10, col11 = st.columns([1.4, 1.0, 1.3])
-    
-    #col9.metric("Selected Customer", customer)
+    col9, col10, col11, col12 = st.columns([1.4, 1.0, 1.0, 1.2])
     
     with col9:
         st.markdown(f'<div class="customer-header-card"><div class="customer-header-card-h">Selected Customer:</div><div class="customer-header-card-b">{customer or "–"}</div></div>', unsafe_allow_html=True)
@@ -613,10 +612,8 @@ if customer != "All":
         st.markdown(f'<div class="customer-header-card"><div class="customer-header-card-h">Outstanding Days:</div><div class="customer-header-card-b">{measures["Outstanding Days"] or "–"}</div></div>', unsafe_allow_html=True)
     with col11:
         st.markdown(f'<div class="customer-header-card"><div class="customer-header-card-h">Samira Team:</div><div class="customer-header-card-b">{cust_sam_team or "–"}</div></div>', unsafe_allow_html=True)
-    
-    
-    #col10.metric("Outstanding Days", measures["Outstanding Days"])
-    #col11.metric("Samira Team", cust_sam_team)
+    with col12:
+        st.markdown(f'<div class="customer-header-card"><div class="customer-header-card-h">Total Polymer Consumed:</div><div class="customer-header-card-b">{polymer_consumed or "–"}</div></div>', unsafe_allow_html=True)    
     
     st.divider()
     
@@ -658,7 +655,8 @@ display_cols = [
     "Other Remarks",
     "Follow up",
     "Follow up Date",
-    "Feedback of Previous Follow Up"
+    "Feedback of Previous Follow Up",
+    "Polymer Consumed"
 ]
 
 display_df = (
