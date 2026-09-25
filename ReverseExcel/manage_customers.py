@@ -34,7 +34,7 @@ def add_customer(branch, area, name, industry):
         return False, f"Customer '{name}' already exists under {branch}."
 
     db.collection("customers").add({
-        "branch":     branch,
+        "branch":     branch.strip().upper(),
         "area":       area.strip(),
         "name":       name.strip(),
         "industry":   industry.strip(),
@@ -50,7 +50,7 @@ def update_customer(doc_id, branch, area, name, industry):
     """Update an existing customer."""
     db = get_db()
     db.collection("customers").document(doc_id).update({
-        "branch":     branch,
+        "branch":     branch.strip().upper(),
         "area":       area.strip(),
         "name":       name.strip(),
         "industry":   industry.strip(),
