@@ -121,7 +121,7 @@ def generate_visit_pdf(filtered_df, customer_filter, area_filter, branch_filter)
                 cell(oldest_bill),
                 cell(get_val("Period (Days)").replace(".0", "")),
                 cell(outstanding),
-                cell(get_val("Polymer Consumed"))
+                cell(f'{get_val("Polymer Consumed")} Kgs.')
             ],
         ]
 
